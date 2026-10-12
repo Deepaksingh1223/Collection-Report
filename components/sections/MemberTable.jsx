@@ -13,13 +13,13 @@ const TABS=[["","All"],["top","Top"],["avg","Average"],["low","Low"]];
 // rows = members in the current focus, allRows = every member. When a focus is active the user can switch to "All members".
 export default function MemberTable({rows,allRows,focused,selectedEx,onSelect,onEdit,onDelete,onAdd,userRole}){
   const [scope,setScope]=useState("focus"),[sort,setSort]=useState({k:"achievement",d:-1}),[pg,setPg]=useState(0),[size,setSize]=useState(10),[tier,setTier]=useState("");
-  const base=focused&&scope==="all"?allRows:rows;
+  const base=userRole==="executive"?rows:(focused&&scope==="all"?allRows:rows);
   useEffect(()=>setPg(0),[base,tier]);
   const ranked=useMemo(()=>[...base].sort((a,b)=>b.achievement-a.achievement).map((e,i)=>({...e,rank:i+1})),[base]);
   const list=useMemo(()=>ranked.filter(e=>!tier||e.tier===tier).sort((a,b)=>(typeof a[sort.k]==="string"?a[sort.k].localeCompare(b[sort.k]):a[sort.k]-b[sort.k])*sort.d),[ranked,tier,sort]);
   const topC=[...base].sort((a,b)=>b.collected-a.collected)[0],topA=ranked[0],pages=Math.max(1,Math.ceil(list.length/size)),view=list.slice(pg*size,pg*size+size);
   const csv=list.map(e=>({Rank:e.rank,Member:e.name,UserID:e.userId,TL:e.tlName,Team:e.team,Target:e.target,Collection:e.collected,Remaining:e.pending,AchievementPct:e.achievement.toFixed(2),Incentive:e.eligible?e.incentive:0,Status:e.status}));
-  const toggle=focused&&<div className="inline-flex rounded-lg bg-slate-100 p-0.5 text-xs font-medium">{[["focus",`Selected (${rows.length})`],["all",`All members (${allRows.length})`]].map(([v,l])=>
+  const toggle=focused&&userRole!=="executive"&&<div className="inline-flex rounded-lg bg-slate-100 p-0.5 text-xs font-medium">{[["focus",`Selected (${rows.length})`],["all",`All members (${allRows.length})`]].map(([v,l])=>
     <button key={v} onClick={()=>setScope(v)} className={`px-2.5 py-1 rounded-md transition ${scope===v?"bg-white shadow-sm text-slate-900":"text-slate-500"}`}>{l}</button>)}</div>;
   const canManage=userRole!=="executive";
   return <Card id="members" title="Individual Performance" subtitle="Click a member to focus" right={<div className="flex items-center gap-2">{toggle}{canManage&&<Btn onClick={onAdd} className="inline-flex items-center gap-1.5"><UserPlus size={14}/>Add Member</Btn>}<Btn onClick={()=>downloadCSV(csv,"team-members.csv")}>Export CSV</Btn></div>}>
