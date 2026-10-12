@@ -1,5 +1,6 @@
 /**
  * Generates date-wise records (Aug, Sep, full Oct 1-6) for every member. Totals match tlData.js exactly. Replace with an API later.
+ * Targets are distributed equally day-by-day (same amount every day). Collections vary realistically day-to-day.
  */
 import {executives,rng} from "./executiveData";
 export const FLOW=["target","collected","contactedAccounts","connectedAccounts","ptpCount","ptpAmount","ptpKept","paidAccounts"];
@@ -13,8 +14,9 @@ function build(){
   executives.forEach(e=>MONTHS.forEach(m=>{
     const cnt=Math.round(e.ptpCount*m.v),T={target:e.target,collected:Math.round(e.collected*m.c),contactedAccounts:Math.round(e.contactedAccounts*m.v),
       connectedAccounts:Math.round(e.connectedAccounts*m.v),ptpCount:cnt,ptpAmount:cnt*18000,ptpKept:Math.min(Math.round(e.ptpKept*m.v),cnt),paidAccounts:Math.round(e.paidAccounts*m.v)};
+    // Equal weights for target (same amount every day), random weights for collections (realistic day-to-day variation)
     const w=Array.from({length:m.days},()=>0.5+r());
-    const parts={};FLOW.forEach(k=>{parts[k]=dist(T[k],k==="target"?w.map(()=>1):w)});
+    const parts={};FLOW.forEach(k=>{parts[k]=dist(T[k],k==="target"?Array.from({length:m.days},()=>1):w)});
     for(let d=0;d<m.days;d++){const rec={date:`${m.ym}-${String(d+1).padStart(2,"0")}`,execId:e.id,imported:false};FLOW.forEach(k=>{rec[k]=parts[k][d]});out.push(rec)}
   }));
   return out;

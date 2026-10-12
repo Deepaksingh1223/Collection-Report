@@ -1,5 +1,5 @@
 /**
- * Brand Target Progress: gauge + target / achieved / achievement % / remaining.
+ * Brand Target Progress: gauge + target / achieved / achievement % / remaining + Head incentive.
  * Props: t (totals from agg()), period (label).
  */
 import {Card,Bar} from "../ui";
@@ -13,5 +13,9 @@ export default function BrandProgress({t,period}){
       <div className="absolute inset-x-0 bottom-1 text-center"><div className="text-3xl font-semibold tabular-nums">{t.achievement.toFixed(1)}%</div><div className="text-xs text-slate-500">achieved</div></div></div>
     <div className="space-y-4"><div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
       {[["Brand target",inr(t.target)],["Achieved",inr(t.collected)],["Achievement",`${t.achievement.toFixed(1)}%`],["Remaining",`${rem.toFixed(1)}% · ${inr(t.pending)}`]].map(([a,b])=><div key={a}><div className="text-[11px] uppercase tracking-wider text-slate-500">{a}</div><div className="text-lg font-semibold tabular-nums">{b}</div></div>)}</div>
-      <Bar v={p} color="bg-slate-800"/><p className="text-xs text-slate-500">{rem>0?`${inr(t.pending)} more collection is needed to complete the brand target.`:"Brand target completed."}</p></div></div></Card>;
+      <Bar v={p} color="bg-slate-800"/>
+      <div className={`rounded-lg px-3 py-2 text-sm ${t.eligible?"bg-emerald-50 ring-1 ring-emerald-200 text-emerald-700":"bg-slate-50 ring-1 ring-slate-200 text-slate-600"}`}>
+        Head Incentive: <b>{inr(t.incentive||0)}</b> · {t.eligible?"Eligible (≥85%)":"Not eligible (<85%)"}
+      </div>
+      <p className="text-xs text-slate-500">{rem>0?`${inr(t.pending)} more collection is needed to complete the brand target.`:"Brand target completed."}</p></div></div></Card>;
 }

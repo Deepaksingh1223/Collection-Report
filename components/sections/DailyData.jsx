@@ -20,18 +20,21 @@ function Chart({rows,selected,onPick}){
 }
 
 // rows = dates in the selected range, allRows = every date of the surrounding month(s). `selected` = single picked date.
-export function DailyData({rows,allRows,selected,onPick}){
+export function DailyData({rows,allRows,selected,onPick,userRole}){
   const [all,setAll]=useState(false),canExpand=allRows.length>rows.length,view=all&&canExpand?allRows:rows;
+  const isExecutive=userRole==="executive";
   return <Card id="trends" title="Date-wise Performance" subtitle="Click a bar or row to focus a date, click again to clear"
     right={canExpand&&<Btn onClick={()=>setAll(!all)}>{all?"Selected dates only":`Show all ${allRows.length} dates`}</Btn>}>
     {!view.length?<Empty/>:<>
     <div className="flex flex-wrap gap-4 text-xs text-slate-500 mb-2"><span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-slate-300"/>Target</span><span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-indigo-600"/>Collection</span><span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-violet-600"/>Imported day</span></div>
     <Chart rows={view} selected={selected} onPick={onPick}/>
     <div className="mt-4 overflow-auto max-h-80 rounded-lg ring-1 ring-slate-100"><table className="w-full text-sm"><thead className="sticky top-0 bg-white shadow-[0_1px_0_#f1f5f9]"><tr>
-      {["Date","Target","Collection","Remaining","Ach %","Top performer","Best TL","Source"].map(h=><th key={h} className={TH}>{h}</th>)}</tr></thead><tbody>
+      {[...["Date","Target","Collection","Remaining","Ach %"],...(!isExecutive?["Top performer","Best TL"]:[]),"Source"].map(h=><th key={h} className={TH}>{h}</th>)}</tr></thead><tbody>
       {view.map(d=><tr key={d.date} onClick={()=>onPick(d.date)} className={`border-t border-slate-50 cursor-pointer hover:bg-indigo-50/40 transition ${selected===d.date?"bg-indigo-50":d.importedCount?"bg-violet-50/60":""} ${d.importedCount?"border-l-2 border-l-violet-500":""}`}>
         <td className={TD+" font-medium"}>{fmtDate(d.date)}</td><td className={TD}>{inr(d.target)}</td><td className={TD}>{inr(d.collected)}</td><td className={TD}>{inr(d.pending)}</td><td className={TD}>{d.achievement.toFixed(1)}%</td>
-        <td className={TD}>{d.topMember}</td><td className={TD}>{d.bestTL}</td><td className={TD}>{d.importedCount?<Pill>Imported · {d.importedCount}</Pill>:<span className="text-slate-400">Historical</span>}</td></tr>)}</tbody></table></div></>}</Card>;
+        {!isExecutive&&<td className={TD}>{d.topMember}</td>}
+        {!isExecutive&&<td className={TD}>{d.bestTL}</td>}
+        <td className={TD}>{d.importedCount?<Pill>Imported · {d.importedCount}</Pill>:<span className="text-slate-400">Historical</span>}</td></tr>)}</tbody></table></div></>}</Card>;
 }
 
 // Month-wise totals with growth over the previous month.
