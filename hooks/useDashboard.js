@@ -8,7 +8,7 @@ import {TLS} from "../data/tlData";
 import {executives} from "../data/executiveData";
 import {baseDaily,FLOW} from "../data/dailyData";
 import {DEFAULT_MONTH} from "../data/dashboardData";
-import {agg,groupTL,status,ach,tierOf} from "../utils/calculations";
+import {agg,groupTL,status,ach,tierOf,incentive,isEligibleForIncentive,headIncentive} from "../utils/calculations";
 import {fmtDate,monthLabel} from "../utils/formatters";
 
 const INIT={tl:"",ex:"",q:"",src:"",month:DEFAULT_MONTH,from:"",to:""};
@@ -20,15 +20,16 @@ const execById=Object.fromEntries(executives.map(e=>[e.id,e]));
 const bestBy=(obj,k)=>Object.entries(obj).sort((a,b)=>b[1][k]-a[1][k])[0];
 
 /* ---------- pure helpers (no React) ---------- */
-// Sum daily records into one row per member: {...member, target, collected, ..., achievement, status, tier}
+// Sum daily records into one row per member: {...member, target, collected, ..., achievement, status, tier, incentive eligibility}
 function buildExecRows(recs,members){
   const m=new Map();
   recs.forEach(r=>{let a=m.get(r.execId);if(!a){a={importedCount:0};FLOW.forEach(k=>a[k]=0);m.set(r.execId,a)}
     FLOW.forEach(k=>{a[k]+=r[k]||0});if(r.imported)a.importedCount++});
   return members.filter(e=>m.has(e.id)).map(e=>{const t={...e,...m.get(e.id),team:teamOf[e.tlId]},x=ach(t.collected,t.target);
-    return{...t,pending:Math.max(t.target-t.collected,0),achievement:x,status:status(x),tier:tierOf(x)}});
+    return{...t,pending:Math.max(t.target-t.collected,0),achievement:x,status:status(x),tier:tierOf(x),
+      incentive:isEligibleForIncentive(x)?incentive(t.collected,x):0,eligible:isEligibleForIncentive(x)}});
 }
-// Team/TL rows (ranked) built from member rows.
+// Team/TL rows (ranked) built from member rows. groupTL already calculates incentive and eligibility.
 function buildTlRows(execRows){
   return groupTL(execRows,TLS).map(t=>({...t,tier:tierOf(t.achievement),avgPerMember:t.teamSize?t.collected/t.teamSize:0,
     importedCount:execRows.filter(e=>e.tlId===t.id).reduce((a,e)=>a+e.importedCount,0)}));
@@ -37,7 +38,7 @@ function buildTlRows(execRows){
 function buildDaily(recs){
   const m=new Map();
   recs.forEach(r=>{let d=m.get(r.date);if(!d){d={date:r.date,target:0,collected:0,importedCount:0,ex:{},tl:{}};m.set(r.date,d)}
-    const e=execById[r.execId];d.target+=r.target;d.collected+=r.collected;if(r.imported)d.importedCount++;
+    const e=execById[r.execId];if(!e)return;d.target+=r.target;d.collected+=r.collected;if(r.imported)d.importedCount++;
     d.ex[r.execId]=d.ex[r.execId]||{c:0};d.ex[r.execId].c+=r.collected;
     d.tl[e.tlId]=d.tl[e.tlId]||{t:0,c:0,a:0};d.tl[e.tlId].t+=r.target;d.tl[e.tlId].c+=r.collected});
   return[...m.values()].sort((a,b)=>a.date.localeCompare(b.date)).map(d=>{
@@ -50,6 +51,10 @@ function buildDaily(recs){
 export function useDashboard(){
   const [f,setF]=useState(INIT),[ready,setReady]=useState(false),[stamp,setStamp]=useState(""),[imported,setImported]=useState([]);
   const [showSummary,setShowSummary]=useState(false),shown=useRef(false);
+
+  // Get user role for role-based filtering (client-side only)
+  const userRole=useMemo(()=>typeof window!=="undefined"?localStorage.getItem("userRole")||"head":"head",[]);
+  const userId=useMemo(()=>typeof window!=="undefined"?localStorage.getItem("userId")||"":"",[]);
 
   // imported rows live in localStorage; `reload` re-reads them (also used by every section's refresh icon)
   const reload=useCallback(()=>{try{const s=JSON.parse(localStorage.getItem(KEY)||"[]");if(Array.isArray(s))setImported(s)}catch{}},[]);
@@ -75,10 +80,24 @@ export function useDashboard(){
     return a<=b?[a,b]:[b,a]},[f.from,f.to,f.month,bounds]);
   const periodLabel=f.from||f.to?(lo===hi?fmtDate(lo):`${fmtDate(lo)} – ${fmtDate(hi)}`):f.month?monthLabel(f.month):"All dates";
 
-  // 3) which members are in focus (team / member / search filters)
+  // 3) which members are in focus (team / member / search filters) - with role-based filtering
   const q=f.q.trim().toLowerCase();
-  const focusMembers=useMemo(()=>executives.filter(e=>(!f.tl||e.tlId===f.tl)&&(!f.ex||e.id===f.ex)&&
-    (!q||[e.name,e.userId,e.tlName,teamOf[e.tlId]].some(x=>x.toLowerCase().includes(q)))),[f.tl,f.ex,q]);
+  const focusMembers=useMemo(()=>{
+    let filtered=executives.filter(e=>(!f.tl||e.tlId===f.tl)&&(!f.ex||e.id===f.ex)&&
+      (!q||[e.name,e.userId,e.tlName,teamOf[e.tlId]].some(x=>x.toLowerCase().includes(q))));
+    // Role-based filtering
+    if(userRole==="executive"){
+      filtered=filtered.filter(e=>e.userId===userId);
+    }else if(userRole==="tl"){
+      // Map userId to tlId: TL-1001 -> TL1, TL-1002 -> TL2
+      const tlIdMap={"TL-1001":"TL1","TL-1002":"TL2"};
+      const userTlId=tlIdMap[userId];
+      if(userTlId){
+        filtered=filtered.filter(e=>e.tlId===userTlId);
+      }
+    }
+    return filtered;
+  },[f.tl,f.ex,q,userRole,userId]);
   const focusIds=useMemo(()=>new Set(focusMembers.map(e=>e.id)),[focusMembers]);
 
   // 4) records in the date window — "focus" (filtered) and "all" (whole brand, used by comparison sections)
@@ -88,9 +107,36 @@ export function useDashboard(){
   // 5) rows for each section
   const execRows=useMemo(()=>buildExecRows(focusRecs,focusMembers),[focusRecs,focusMembers]);       // focused members
   const allExecRows=useMemo(()=>buildExecRows(inWindow,executives),[inWindow]);                        // everyone
-  const total=useMemo(()=>agg(execRows),[execRows]);
+  const total=useMemo(()=>{const t=agg(execRows);return{...t,incentive:headIncentive(t.collected,t.achievement),eligible:isEligibleForIncentive(t.achievement)}},[execRows]);
   const tlRows=useMemo(()=>buildTlRows(execRows),[execRows]);
   const allTlRows=useMemo(()=>buildTlRows(allExecRows),[allExecRows]);
+
+  // Role-based TL filtering for TeamTree and TeamPerformance
+  const visibleTlRows=useMemo(()=>{
+    if(!userRole||userRole==="head") return allTlRows;
+    if(userRole==="tl"){
+      const tlIdMap={"TL-1001":"TL1","TL-1002":"TL2"};
+      const userTlId=tlIdMap[userId];
+      if(userTlId){
+        return allTlRows.filter(t=>t.id===userTlId);
+      }
+    }
+    return allTlRows;
+  },[allTlRows,userRole,userId]);
+
+  const visibleExecRows=useMemo(()=>{
+    if(!userRole||userRole==="head") return allExecRows;
+    if(userRole==="tl"){
+      const tlIdMap={"TL-1001":"TL1","TL-1002":"TL2"};
+      const userTlId=tlIdMap[userId];
+      if(userTlId){
+        return allExecRows.filter(e=>e.tlId===userTlId);
+      }
+    }else if(userRole==="executive"){
+      return allExecRows.filter(e=>e.userId===userId);
+    }
+    return allExecRows;
+  },[allExecRows,userRole,userId]);
 
   // 6) date-wise rows: `daily` follows the chosen dates, `dailyCtx` is the whole month(s) around them
   const daily=useMemo(()=>buildDaily(focusRecs),[focusRecs]);
@@ -116,6 +162,6 @@ export function useDashboard(){
   const clearImported=useCallback(()=>persist([]),[]);
 
   return{f,set,reset,resetDates,showEverything,ready,stamp,refresh,reload,months,bounds,periodLabel,
-    execRows,allExecRows,total,tlRows,allTlRows,daily,dailyCtx,monthly,insights,
-    importedTotal:imported.length,importRecords,clearImported,showSummary,setShowSummary};
+    execRows,allExecRows,total,tlRows,allTlRows,visibleTlRows,visibleExecRows,daily,dailyCtx,monthly,insights,
+    importedTotal:imported.length,importRecords,clearImported,showSummary,setShowSummary,userRole,userId};
 }

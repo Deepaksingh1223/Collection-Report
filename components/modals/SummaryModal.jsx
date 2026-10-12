@@ -2,7 +2,7 @@
  * Performance Summary popup (opens on load and from the header). Fully driven by `insights` from the hook, so it follows month/date filters.
  */
 import {useEffect} from "react";
-import {AlertTriangle,Sparkles,Star,X} from "lucide-react";
+import {AlertTriangle,Sparkles,Star,X,Wallet} from "lucide-react";
 import {fmtDate,inr} from "../../utils/formatters";
 import {Bar} from "../ui";
 const Row=({a,b,c})=><li className="flex items-center justify-between gap-3 py-1.5 text-sm border-t border-black/5 first:border-0"><span className="font-medium truncate">{a}</span><span className="text-slate-600 tabular-nums whitespace-nowrap">{b}{c&&<span className="ml-2 font-semibold text-slate-900">{c}</span>}</span></li>;
@@ -16,21 +16,27 @@ export default function SummaryModal({d,onClose,onImport}){
       {empty?<p className="py-10 text-center text-sm text-slate-500">No collection data found for the selected filters.</p>:<>
       <section className="mt-4 rounded-xl bg-sky-50 ring-1 ring-sky-100 p-4"><h3 className="text-sm font-semibold text-sky-800 mb-3">🎯 Brand performance</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">{[["Brand target",inr(t.target)],["Total achievement",inr(t.collected)],["Achievement",`${t.achievement.toFixed(1)}%`],["Remaining",`${inr(t.pending)} (${rem.toFixed(1)}%)`]].map(([a,b])=><div key={a}><div className="text-[11px] uppercase tracking-wider text-slate-500">{a}</div><div className="font-semibold tabular-nums">{b}</div></div>)}</div>
-        <div className="mt-3"><Bar v={t.achievement} color="bg-sky-600"/></div></section>
+        <div className="mt-3"><Bar v={t.achievement} color="bg-sky-600"/></div>
+        <div className={`mt-3 rounded-lg px-3 py-2 text-sm ${t.eligible?"bg-emerald-100 ring-1 ring-emerald-300 text-emerald-800":"bg-slate-100 ring-1 ring-slate-300 text-slate-600"}`}>
+          <Wallet size={14} className="inline mr-1"/> Head Incentive: <b>{inr(t.incentive||0)}</b> · {t.eligible?"Eligible (≥85%)":"Not eligible (<85%)"}
+        </div></section>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <section className="rounded-xl bg-emerald-50 ring-1 ring-emerald-200 p-4"><h3 className="flex items-center gap-1.5 text-sm font-semibold text-emerald-800 mb-2"><Star size={15} fill="currentColor"/>Top performers</h3><ul>
           {d.bestTL&&<Row a={`Best team: ${d.bestTL.team}`} b={`TL ${d.bestTL.name}`} c={`${d.bestTL.achievement.toFixed(1)}%`}/>}
+          {d.bestTL&&<Row a={`TL Incentive`} b="" c={d.bestTL.eligible?inr(d.bestTL.incentive||0):"Not eligible"}/>}
           {d.top[0]&&<Row a={`Best member: ${d.top[0].name}`} b={d.top[0].tlName} c={`${d.top[0].achievement.toFixed(1)}%`}/>}
+          {d.top[0]&&<Row a={`Member Incentive`} b="" c={d.top[0].eligible?inr(d.top[0].incentive||0):"Not eligible"}/>}
           {d.topCollector&&<Row a={`Highest collection: ${d.topCollector.name}`} b="" c={inr(d.topCollector.collected)}/>}
           {d.bestDay&&<Row a={`Best day: ${fmtDate(d.bestDay.date)}`} b="" c={inr(d.bestDay.collected)}/>}
           {d.top.map((e,i)=><Row key={e.id} a={`${["🏆","🥈","🥉"][i]} ${e.name}`} b={inr(e.collected)} c={`${e.achievement.toFixed(1)}%`}/>)}</ul></section>
         <section className="rounded-xl bg-slate-50 ring-1 ring-slate-200 p-4"><h3 className="flex items-center gap-1.5 text-sm font-semibold text-amber-700 mb-2"><AlertTriangle size={15}/>Attention required</h3><ul>
           {d.worstTL&&<Row a={`Lowest team: ${d.worstTL.team}`} b={`TL ${d.worstTL.name}`} c={`${d.worstTL.achievement.toFixed(1)}%`}/>}
+          {d.worstTL&&<Row a={`TL Incentive`} b="" c={d.worstTL.eligible?inr(d.worstTL.incentive||0):"Not eligible"}/>}
           {d.lowTLs.filter(x=>x!==d.worstTL).map(x=><Row key={x.id} a={`Low TL: ${x.name}`} b={x.team} c={`${x.achievement.toFixed(1)}%`}/>)}
           {d.behind.map(x=><Row key={x.id} a={`${x.team} behind target`} b="Remaining" c={inr(x.pending)}/>)}
           {d.lowMembers.slice(0,3).map(e=><Row key={e.id} a={`↓ ${e.name}`} b={e.tlName} c={`${e.achievement.toFixed(1)}%`}/>)}
           {d.lowDay&&<Row a={`Lowest day: ${fmtDate(d.lowDay.date)}`} b="" c={inr(d.lowDay.collected)}/>}</ul></section></div></>}
-      <section className="mt-4 rounded-xl bg-violet-50 ring-2 ring-violet-300 p-4"><h3 className="flex items-center gap-1.5 text-sm font-semibold text-violet-800"><Sparkles size={15}/>Imported / new data</h3>
+      <section className="mt-4 rounded-xl bg-violet-50 ring-2 ring-violet-300 p-4 " style={{display:'none'}}><h3 className="flex items-center gap-1.5 text-sm font-semibold text-violet-800"><Sparkles size={15}/>Imported / new data</h3>
         {d.impRecs>0?<p className="text-sm mt-1.5 text-violet-900">{d.impRecs} imported rows for {d.impExecs} members in this period ({d.impDates.length===1?fmtDate(d.impDates[0]):`${fmtDate(d.impDates[0])} – ${fmtDate(d.impDates[d.impDates.length-1])}`}). Marked <b>New data</b> across the dashboard.</p>
         :<p className="text-sm mt-1.5 text-violet-900">{d.impTotal>0?`No imported rows in this period (${d.impTotal} exist in other dates).`:"No imported data yet. Import a CSV to see new data highlighted here."}</p>}
         <button onClick={onImport} className="mt-3 text-sm font-medium text-violet-700 underline underline-offset-2">Import data</button></section>

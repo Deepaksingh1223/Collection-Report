@@ -2,7 +2,7 @@
  * 8 soft-coloured KPI cards. Tier (top / average / low) comes from the health score + performanceBands in data/dashboardData.js.
  * Props: t totals, tlRows, members, imported (count of imported rows -> New data badge). Has its own refresh icon.
  */
-import {Crown,Gauge,Hourglass,IndianRupee,Sparkles,Star,Target,TrendingUp,Users} from "lucide-react";
+import {Crown,Gauge,Hourglass,IndianRupee,Sparkles,Star,Target,TrendingUp,Users,Wallet} from "lucide-react";
 import {AlertTriangle} from "lucide-react";
 import {Bar,SectionHead,SectionSkeleton,useSectionRefresh} from "../ui";
 import {inr,pct} from "../../utils/formatters";
@@ -24,7 +24,7 @@ export default function KPICards({t,tlRows,members,imported}){
     {l:"Remaining Target",v:inr(t.pending),s:`${clamp(100-t.achievement).toFixed(1)}% left`,I:Hourglass,c:"amber",h:clamp(100-t.achievement)},
     {l:"Active Team",v:`${active} / ${members.length}`,s:"Members with collection",I:Users,c:"indigo",h:members.length?active/members.length*100:0,p:members.length?active/members.length*100:0},
     {l:"Overall Performance",v:status(t.achievement),s:`${t.achievement.toFixed(1)}% achievement`,I:TrendingUp,c:"teal",h:t.achievement,flow:1},
-    {l:"Best TL",v:bestTL?bestTL.name:"-",s:bestTL?`${bestTL.team} · ${bestTL.achievement.toFixed(1)}%`:"",I:Crown,c:"rose",h:bestTL?bestTL.achievement:null,best:!!bestTL&&tlRows.length>1},
+    {l:"Head Incentive",v:inr(t.incentive||0),s:t.eligible?"Eligible (≥85%)":"Not eligible (<85%)",I:Wallet,c:"rose",h:t.eligible?100:0,p:t.eligible?100:0,eligible:t.eligible},
     {l:"Top Performer",v:topM?topM.name:"-",s:topM?`${topM.tlName}'s team · ${topM.achievement.toFixed(1)}%`:"",I:Star,c:"cyan",h:topM?topM.achievement:null,best:!!topM&&members.length>1}];
   return <section id="kpis" className="scroll-mt-24 space-y-3"><SectionHead title="Key Metrics" subtitle="Brand and team performance at a glance" r={r}/>
   {r.loading?<SectionSkeleton/>:<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">{cards.map(k=>{
@@ -35,6 +35,7 @@ export default function KPICards({t,tlRows,members,imported}){
         <div className="flex flex-col items-end gap-1">
           {ti==="top"&&<span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700"><Star size={12} fill="currentColor"/>{k.best?"#1 Best":"Top performer"} ↑</span>}
           {low&&<span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600"><AlertTriangle size={12}/>↓ Attention</span>}
+          {k.eligible&&<span className="inline-flex items-center gap-1 text-[10px] font-semibold rounded-full bg-emerald-600 text-white px-2 py-0.5"><Sparkles size={10}/>Eligible</span>}
           {k.flow&&imported>0&&<span className="inline-flex items-center gap-1 text-[10px] font-semibold rounded-full bg-violet-600 text-white px-2 py-0.5"><Sparkles size={10}/>New data</span>}</div></div>
       <div className="mt-3 text-[11px] font-medium uppercase tracking-wider opacity-70">{k.l}</div>
       <div className={`text-2xl font-semibold tracking-tight truncate ${low?"text-slate-600":"text-slate-900"}`}>{k.v}</div>

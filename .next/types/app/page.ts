@@ -1,4 +1,4 @@
-// File: C:\Users\User\Desktop\one\loan-dashboard (1)\loan-dashboard\app\page.js
+// File: C:\Users\User\Desktop\Deepak\one\loan-dashboard (1)\loan-dashboard\app\page.js
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
