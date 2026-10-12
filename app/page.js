@@ -78,24 +78,27 @@ export default function Page(){
   };
 
   return <RefreshContext.Provider value={d.reload}>
-    <DashboardHeader stamp={d.stamp} period={d.periodLabel} importedTotal={d.importedTotal} onRefresh={d.refresh} onImport={openImport} onSummary={()=>d.setShowSummary(true)} onLogout={handleLogout} onAuditLog={()=>setAuditLogOpen(true)} userRole={userRole}/>
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-      <FilterBar f={f} set={d.set} reset={d.reset} resetDates={d.resetDates} months={d.months} bounds={d.bounds} userRole={userRole} userId={userId}/>
-      {userRole!=="executive"&&<ActiveFilters f={f} onClear={k=>d.set(k==="tl"?{tl:"",ex:""}:{[k]:""})} onShowAll={d.showEverything}/>}
-      {userRole==="executive"&&d.execRows.length>0&&<ExecutiveKPICards member={d.execRows[0]}/>}
-      {!d.ready?<Skeleton/>:!d.execRows.length?<Card title="Performance"><Empty/></Card>:<>
-        {userRole!=="executive"&&<HeadlineBanner d={d.insights}/>}
-        {userRole!=="executive"&&<SectionNav/>}
-        {userRole!=="executive"&&<BrandProgress t={d.total} period={d.periodLabel}/>}
-        {userRole!=="executive"&&<KPICards t={d.total} tlRows={d.tlRows} members={d.insights.members} imported={d.insights.impRecs}/>}
-        {userRole!=="executive"&&<TeamTree tlRows={d.visibleTlRows} allExecRows={d.visibleExecRows}/>}
-        {userRole!=="executive"&&<TeamPerformance rows={d.visibleTlRows} selected={f.tl} onSelect={toggleTL}/>}
-        {userRole!=="executive"&&<div className="grid gap-5 lg:grid-cols-2"><TLPerformance rows={d.visibleTlRows} selected={f.tl} onSelect={toggleTL}/><TeamChart rows={d.visibleTlRows} selected={f.tl}/></div>}
-        <MemberTable rows={d.execRows} allRows={d.visibleExecRows} focused={focused} selectedEx={f.ex} onSelect={e=>d.set({tl:e.tlId,ex:f.ex===e.id?"":e.id})} onAdd={handleAddMember} onEdit={handleEditMember} onDelete={handleDeleteMember} userRole={userRole}/>
-        <div className="grid gap-5 lg:grid-cols-2"><TrendChart rows={d.daily}/>{userRole!=="executive"&&<TopChart rows={d.visibleExecRows}/>}</div>
-        <div className="grid gap-5 lg:grid-cols-3"><div className="lg:col-span-2 overflow-auto"><DailyData rows={d.daily} allRows={d.dailyCtx} selected={f.from&&f.from===f.to?f.from:""} onPick={pickDate} userRole={userRole}/></div><MonthlyTrend rows={d.monthly}/></div>
-        {userRole!=="executive"&&<AttentionPanel tlRows={d.visibleTlRows} members={d.visibleExecRows} onSelect={d.set}/>}</>}
-    </main>
+    {!d.ready?<Skeleton/>:<>
+      <DashboardHeader stamp={d.stamp} period={d.periodLabel} importedTotal={d.importedTotal} onRefresh={d.refresh} onImport={openImport} onSummary={()=>d.setShowSummary(true)} onLogout={handleLogout} onAuditLog={()=>setAuditLogOpen(true)} userRole={userRole}/>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+        <FilterBar f={f} set={d.set} reset={d.reset} resetDates={d.resetDates} months={d.months} bounds={d.bounds} userRole={userRole} userId={userId}/>
+        {userRole!=="executive"&&<ActiveFilters f={f} onClear={k=>d.set(k==="tl"?{tl:"",ex:""}:{[k]:""})} onShowAll={d.showEverything}/>}
+        {userRole==="executive"&&d.execRows.length>0&&<ExecutiveKPICards member={d.execRows[0]}/>}
+        {!d.execRows.length?<Card title="Performance"><Empty/></Card>:<>
+          {userRole!=="executive"&&<HeadlineBanner d={d.insights}/>}
+          {userRole!=="executive"&&<SectionNav/>}
+          {userRole!=="executive"&&<BrandProgress t={d.total} period={d.periodLabel}/>}
+          {userRole!=="executive"&&<KPICards t={d.total} tlRows={d.tlRows} members={d.insights.members} imported={d.insights.impRecs}/>}
+          {userRole!=="executive"&&<TeamTree tlRows={d.visibleTlRows} allExecRows={d.visibleExecRows}/>}
+          {userRole!=="executive"&&<TeamPerformance rows={d.visibleTlRows} selected={f.tl} onSelect={toggleTL}/>}
+          {userRole!=="executive"&&<div className="grid gap-5 lg:grid-cols-2"><TLPerformance rows={d.visibleTlRows} selected={f.tl} onSelect={toggleTL}/><TeamChart rows={d.visibleTlRows} selected={f.tl}/></div>}
+          <MemberTable rows={d.execRows} allRows={d.visibleExecRows} focused={focused} selectedEx={f.ex} onSelect={e=>d.set({tl:e.tlId,ex:f.ex===e.id?"":e.id})} onAdd={handleAddMember} onEdit={handleEditMember} onDelete={handleDeleteMember} userRole={userRole}/>
+          <div className="grid gap-5 lg:grid-cols-2"><TrendChart rows={d.daily}/>{userRole!=="executive"&&<TopChart rows={d.visibleExecRows}/>}</div>
+          <div className="grid gap-5 lg:grid-cols-3"><div className="lg:col-span-2 overflow-auto"><DailyData rows={d.daily} allRows={d.dailyCtx} selected={f.from&&f.from===f.to?f.from:""} onPick={pickDate} userRole={userRole}/></div><MonthlyTrend rows={d.monthly}/></div>
+          {userRole!=="executive"&&<AttentionPanel tlRows={d.visibleTlRows} members={d.visibleExecRows} onSelect={d.set}/>}
+        </>}
+      </main>
+    </>}
     {d.showSummary&&<SummaryModal d={d.insights} onClose={()=>d.setShowSummary(false)} onImport={openImport}/>}
     <ImportDialog open={importing} onClose={()=>setImporting(false)} onImport={d.importRecords} importedTotal={d.importedTotal} onClear={d.clearImported}/>
     <AddMemberModal open={addMemberOpen} onClose={()=>setAddMemberOpen(false)} onSuccess={handleMemberSuccess}/>
