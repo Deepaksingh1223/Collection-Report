@@ -2,7 +2,7 @@
  * Brand name, head, reporting month, today's date, incentive slabs and the Top/Average/Low bands (performanceBands).
  * Total monthly target: ₹10 Crore
  */
-export const brand="ABC Finance";
+export const brand="Instant Fundz";
 export const head={id:"H001",name:"Rahul Sharma",userId:"HD-001"};
 export const reportingMonth="October 2026";
 export const reportingDate="06 Oct 2026";

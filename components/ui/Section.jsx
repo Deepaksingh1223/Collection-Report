@@ -20,17 +20,17 @@ export function useSectionRefresh(){
 }
 export const RefreshButton=({r})=><span className="inline-flex items-center gap-1.5">
   {r?.stamp&&<span className="hidden sm:inline text-[10px] text-slate-400">Updated {r.stamp}</span>}
-  <button onClick={r?.refresh} title="Refresh this section" aria-label="Refresh this section" className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition">
+  <button onClick={r?.refresh} title="Refresh this section" aria-label="Refresh this section" className="p-1.5 rounded-lg text-slate-400 hover:text-brand-orange hover:bg-orange-50 transition">
     <RefreshCw size={14} className={r?.loading?"animate-spin":""}/></button></span>;
 
 // Header row used by sections that are not wrapped in a Card (e.g. the KPI grid).
-export const SectionHead=({title,subtitle,r})=><div className="flex items-start justify-between gap-3"><div><h2 className="text-[15px] font-semibold">{title}</h2>{subtitle&&<p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}</div>{r&&<RefreshButton r={r}/>}</div>;
+export const SectionHead=({title,subtitle,r})=><div className="flex items-start justify-between gap-3"><div><h2 className="text-[15px] font-semibold text-brand-dark">{title}</h2>{subtitle&&<p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}</div>{r&&<RefreshButton r={r}/>}</div>;
 
 // Standard white section card with its own refresh icon. `id` is used by the top navigation chips.
 export function Card({id,title,subtitle,right,children,className=""}){
   const r=useSectionRefresh();
   return <section id={id} className={`scroll-mt-24 bg-white rounded-xl ring-1 ring-slate-200/70 shadow-sm p-5 min-w-0 animate-fadeUp ${className}`}>
-    <div className="flex items-start justify-between gap-3 mb-4"><div><h2 className="text-[15px] font-semibold text-slate-900">{title}</h2>{subtitle&&<p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}</div>
+    <div className="flex items-start justify-between gap-3 mb-4"><div><h2 className="text-[15px] font-semibold text-brand-dark">{title}</h2>{subtitle&&<p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}</div>
       <div className="flex items-center gap-2 shrink-0">{right}{r&&<RefreshButton r={r}/>}</div></div>
     {r?.loading?<SectionSkeleton/>:children}</section>;
 }
