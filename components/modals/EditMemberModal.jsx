@@ -94,14 +94,14 @@ export default function EditMemberModal({open,onClose,onSuccess,member}){
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"/>
             <input type="text" value={formData.name} onChange={e=>setFormData({...formData,name:e.target.value})}
-              placeholder="Enter full name" className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required/>
+              placeholder="Enter full name" className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange focus:border-brand-orange outline-none" required/>
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Team Leader *</label>
           <select value={formData.tlId} onChange={e=>setFormData({...formData,tlId:e.target.value})}
-            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange focus:border-brand-orange outline-none" required>
             {TLS.map(tl=>(
               <option key={tl.id} value={tl.id}>{tl.name} - {tl.team}</option>
             ))}
@@ -111,7 +111,7 @@ export default function EditMemberModal({open,onClose,onSuccess,member}){
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Monthly Target (₹) *</label>
           <input type="number" value={formData.target} onChange={e=>setFormData({...formData,target:e.target.value})}
-            placeholder="Enter target amount" className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required/>
+            placeholder="Enter target amount" className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange focus:border-brand-orange outline-none" required/>
           {formData.target&&<p className="text-xs text-slate-500 mt-1">Target: {inr(Number(formData.target))}</p>}
         </div>
 
@@ -147,7 +147,7 @@ export default function EditMemberModal({open,onClose,onSuccess,member}){
 
         <div className="flex gap-3 pt-4">
           <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition">Cancel</button>
-          <button type="submit" disabled={loading} className="flex-1 px-4 py-2.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-400 transition">
+          <button type="submit" disabled={loading} className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-brand-orange to-brand-red text-white hover:from-orange-600 hover:to-red-700 disabled:from-slate-400 disabled:to-slate-500 transition">
             {loading?"Updating...":"Update Member"}
           </button>
         </div>
