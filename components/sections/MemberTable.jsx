@@ -26,8 +26,8 @@ export default function MemberTable({rows,allRows,focused,selectedEx,onSelect,on
     {topC&&<div className="grid sm:grid-cols-2 gap-3 mb-4 text-sm"><div className="rounded-lg bg-emerald-50 ring-1 ring-emerald-100 px-3 py-2">Highest collection: <b>{topC.name}</b> · {inr(topC.collected)}</div><div className="rounded-lg bg-emerald-50 ring-1 ring-emerald-100 px-3 py-2">Highest achievement: <b>{topA.name}</b> · {topA.achievement.toFixed(1)}%</div></div>}
     <div className="flex flex-wrap gap-2 mb-3">{TABS.map(([v,l])=><button key={l} onClick={()=>setTier(v)} className={`px-3 py-1 rounded-full text-xs font-medium transition ${tier===v?"bg-slate-900 text-white":"bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{l} {v?ranked.filter(e=>e.tier===v).length:ranked.length}</button>)}</div>
     <div className="overflow-x-auto"><table className="w-full text-sm"><thead className="border-b border-slate-100"><tr><th className={TH}>Rank</th>
-      {COLS.map(([k,l])=><th key={k} onClick={()=>setSort(s=>({k,d:s.k===k?-s.d:-1}))} className={TH+" cursor-pointer select-none hover:text-slate-800"}>{l}{sort.k===k?(sort.d>0?" ▲":" ▼"):""}</th>)}{canManage&&<th className={TH}>Actions</th>}</tr></thead><tbody>
-      {view.map(e=><tr key={e.id} onClick={()=>onSelect(e)} className={`border-b border-slate-50 last:border-0 cursor-pointer transition hover:bg-indigo-50/40 ${selectedEx===e.id?"bg-indigo-50 ring-1 ring-inset ring-indigo-300":e.importedCount>0?"bg-violet-50/60 border-l-2 border-l-violet-500":e.tier==="top"?"bg-emerald-50/40":e.tier==="low"?"text-slate-500":""}`}>
+      {COLS.map(([k,l])=><th key={k} onClick={()=>setSort(s=>({k,d:s.k===k?-s.d:-1}))} className={TH+" cursor-pointer select-none hover:text-brand-orange"}>{l}{sort.k===k?(sort.d>0?" ▲":" ▼"):""}</th>)}{canManage&&<th className={TH}>Actions</th>}</tr></thead><tbody>
+      {view.map(e=><tr key={e.id} onClick={()=>onSelect(e)} className={`border-b border-slate-50 last:border-0 cursor-pointer transition hover:bg-orange-50/40 ${selectedEx===e.id?"bg-orange-50 ring-1 ring-inset ring-brand-orange":e.importedCount>0?"bg-orange-50/60 border-l-2 border-l-brand-orange":e.tier==="top"?"bg-emerald-50/40":e.tier==="low"?"text-slate-500":""}`}>
         <td className={TD}>{medal(e.rank)}</td><td className={TD+" font-medium"}>{e.rank===1&&<Trophy size={13} className="inline mr-1 text-amber-500"/>}{e.name}{e.importedCount>0&&<span className="ml-2"><Pill>New data</Pill></span>}</td>
         <td className={TD}>{e.userId}</td><td className={TD}>{e.tlName}</td><td className={TD}>{e.team}</td><td className={TD}>{inr(e.target)}</td><td className={TD}>{inr(e.collected)}</td><td className={TD}>{inr(e.pending)}</td><td className={TD}>{e.achievement.toFixed(1)}%</td>
         <td className={TD}>{e.eligible?<span className="text-emerald-600 font-medium">{inr(e.incentive||0)}</span>:<span className="text-slate-400">-</span>}</td>
@@ -35,7 +35,7 @@ export default function MemberTable({rows,allRows,focused,selectedEx,onSelect,on
         {canManage&&(
           <td className={TD} onClick={e=>e.stopPropagation()}>
             <div className="flex items-center gap-1">
-              <button onClick={()=>onEdit(e)} className="p-1.5 rounded hover:bg-blue-100 text-blue-600 transition" title="Edit"><Edit size={14}/></button>
+              <button onClick={()=>onEdit(e)} className="p-1.5 rounded hover:bg-orange-100 text-brand-orange transition" title="Edit"><Edit size={14}/></button>
               <button onClick={()=>onDelete(e)} className="p-1.5 rounded hover:bg-red-100 text-red-600 transition" title="Delete"><Trash2 size={14}/></button>
             </div>
           </td>

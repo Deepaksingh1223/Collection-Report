@@ -6,6 +6,7 @@
 import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import {TLS} from "../data/tlData";
 import {executives} from "../data/executiveData";
+import {getAllMembers} from "../utils/dataManager";
 import {baseDaily,FLOW} from "../data/dailyData";
 import {DEFAULT_MONTH} from "../data/dashboardData";
 import {agg,groupTL,status,ach,tierOf,incentive,isEligibleForIncentive,headIncentive} from "../utils/calculations";
@@ -16,7 +17,6 @@ const KEY="lcd.imported.v1";
 const keyOf=r=>`${r.date}|${r.execId}`;
 const srcOk=(src,r)=>!src||(src==="imported")===!!r.imported;
 const teamOf=Object.fromEntries(TLS.map(t=>[t.id,t.team]));
-const execById=Object.fromEntries(executives.map(e=>[e.id,e]));
 const bestBy=(obj,k)=>Object.entries(obj).sort((a,b)=>b[1][k]-a[1][k])[0];
 
 /* ---------- pure helpers (no React) ---------- */
@@ -35,7 +35,7 @@ function buildTlRows(execRows){
     importedCount:execRows.filter(e=>e.tlId===t.id).reduce((a,e)=>a+e.importedCount,0)}));
 }
 // One row per date with the day's best member and best TL.
-function buildDaily(recs){
+function buildDaily(recs,execById){
   const m=new Map();
   recs.forEach(r=>{let d=m.get(r.date);if(!d){d={date:r.date,target:0,collected:0,importedCount:0,ex:{},tl:{}};m.set(r.date,d)}
     const e=execById[r.execId];if(!e)return;d.target+=r.target;d.collected+=r.collected;if(r.imported)d.importedCount++;
@@ -55,6 +55,10 @@ export function useDashboard(){
   // Get user role for role-based filtering (client-side only)
   const userRole=useMemo(()=>typeof window!=="undefined"?localStorage.getItem("userRole")||"head":"head",[]);
   const userId=useMemo(()=>typeof window!=="undefined"?localStorage.getItem("userId")||"":"",[]);
+
+  // Get all members (base + localStorage changes)
+  const allMembers=useMemo(()=>typeof window!=="undefined"?getAllMembers():executives,[userRole,userId]);
+  const execById=useMemo(()=>Object.fromEntries(allMembers.map(e=>[e.id,e])),[allMembers]);
 
   // imported rows live in localStorage; `reload` re-reads them (also used by every section's refresh icon)
   const reload=useCallback(()=>{try{const s=JSON.parse(localStorage.getItem(KEY)||"[]");if(Array.isArray(s))setImported(s)}catch{}},[]);
@@ -83,7 +87,7 @@ export function useDashboard(){
   // 3) which members are in focus (team / member / search filters) - with role-based filtering
   const q=f.q.trim().toLowerCase();
   const focusMembers=useMemo(()=>{
-    let filtered=executives.filter(e=>(!f.tl||e.tlId===f.tl)&&(!f.ex||e.id===f.ex)&&
+    let filtered=allMembers.filter(e=>(!f.tl||e.tlId===f.tl)&&(!f.ex||e.id===f.ex)&&
       (!q||[e.name,e.userId,e.tlName,teamOf[e.tlId]].some(x=>x.toLowerCase().includes(q))));
     // Role-based filtering
     if(userRole==="executive"){
@@ -97,7 +101,7 @@ export function useDashboard(){
       }
     }
     return filtered;
-  },[f.tl,f.ex,q,userRole,userId]);
+  },[f.tl,f.ex,q,userRole,userId,allMembers]);
   const focusIds=useMemo(()=>new Set(focusMembers.map(e=>e.id)),[focusMembers]);
 
   // 4) records in the date window — "focus" (filtered) and "all" (whole brand, used by comparison sections)
@@ -106,7 +110,7 @@ export function useDashboard(){
 
   // 5) rows for each section
   const execRows=useMemo(()=>buildExecRows(focusRecs,focusMembers),[focusRecs,focusMembers]);       // focused members
-  const allExecRows=useMemo(()=>buildExecRows(inWindow,executives),[inWindow]);                        // everyone
+  const allExecRows=useMemo(()=>buildExecRows(inWindow,allMembers),[inWindow,allMembers]);          // everyone
   const total=useMemo(()=>{const t=agg(execRows);return{...t,incentive:headIncentive(t.collected,t.achievement),eligible:isEligibleForIncentive(t.achievement)}},[execRows]);
   const tlRows=useMemo(()=>buildTlRows(execRows),[execRows]);
   const allTlRows=useMemo(()=>buildTlRows(allExecRows),[allExecRows]);
@@ -139,8 +143,8 @@ export function useDashboard(){
   },[allExecRows,userRole,userId]);
 
   // 6) date-wise rows: `daily` follows the chosen dates, `dailyCtx` is the whole month(s) around them
-  const daily=useMemo(()=>buildDaily(focusRecs),[focusRecs]);
-  const dailyCtx=useMemo(()=>buildDaily(records.filter(r=>r.date>=`${lo.slice(0,7)}-01`&&r.date<=`${hi.slice(0,7)}-31`&&focusIds.has(r.execId)&&srcOk(f.src,r))),[records,lo,hi,focusIds,f.src]);
+  const daily=useMemo(()=>buildDaily(focusRecs,execById),[focusRecs,execById]);
+  const dailyCtx=useMemo(()=>buildDaily(records.filter(r=>r.date>=`${lo.slice(0,7)}-01`&&r.date<=`${hi.slice(0,7)}-31`&&focusIds.has(r.execId)&&srcOk(f.src,r)),execById),[records,lo,hi,focusIds,f.src,execById]);
   const monthly=useMemo(()=>{const m={};
     records.forEach(r=>{if(!focusIds.has(r.execId)||!srcOk(f.src,r))return;const k=r.date.slice(0,7);m[k]=m[k]||{ym:k,target:0,collected:0,importedCount:0};m[k].target+=r.target;m[k].collected+=r.collected;if(r.imported)m[k].importedCount++});
     const L=Object.values(m).sort((a,b)=>a.ym.localeCompare(b.ym));
