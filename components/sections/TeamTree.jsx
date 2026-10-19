@@ -5,6 +5,7 @@ import {ChevronDown,ChevronRight,Crown,Users} from "lucide-react";
 import {Card} from "../ui";
 import {inr} from "../../utils/formatters";
 import {useState} from "react";
+import {head} from "../../data/dashboardData";
 
 export default function TeamTree({tlRows,allExecRows}){
   const [expanded,setExpanded]=useState({});
@@ -21,8 +22,8 @@ export default function TeamTree({tlRows,allExecRows}){
             <Crown size={20} className="text-amber-400"/>
           </div>
           <div className="flex-1">
-            <div className="font-semibold">Rahul Sharma</div>
-            <div className="text-xs text-slate-300">Head · HD-001</div>
+            <div className="font-semibold">Instant Fundz</div>
+            <div className="text-xs text-slate-300">Head · {head.userId}</div>
           </div>
           <div className="text-right">
             <div className="text-sm font-medium">Target: ₹10 Cr</div>

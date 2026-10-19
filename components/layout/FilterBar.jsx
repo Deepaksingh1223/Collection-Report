@@ -33,7 +33,7 @@ export default function FilterBar({f,set,reset,resetDates,months,bounds,userRole
       <Sel label="Data source" v={f.src} set={v=>set({src:v})} opts={[{v:"imported",l:"Imported only"},{v:"historical",l:"Historical only"}]}/>
       <div className="col-span-2 flex flex-wrap gap-2"><Btn onClick={()=>preset(TODAY,TODAY)}>Today</Btn><Btn onClick={()=>preset(addDays(TODAY,-1),addDays(TODAY,-1))}>Yesterday</Btn><Btn onClick={()=>preset(addDays(TODAY,-6),TODAY)}>Last 7 days</Btn><Btn onClick={resetDates}>Reset dates</Btn></div></div>
     {userRole!=="executive"&&<div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-end border-t border-slate-100 pt-4">
-      <Sel label="Team / TL" v={f.tl} set={v=>set({tl:v,ex:""})} opts={visibleTLs.map(t=>({v:t.id,l:`${t.team} · ${t.name}`}))}/>
+      <Sel label="Instant Fundz" v={f.tl} set={v=>set({tl:v,ex:""})} opts={visibleTLs.map(t=>({v:t.id,l:`Instant Fundz · ${t.name}`}))}/>
       <Sel label="Team member" v={f.ex} set={v=>set({ex:v})} opts={visibleExecutives.filter(e=>!f.tl||e.tlId===f.tl).map(e=>({v:e.id,l:e.name}))}/>
       <label className="col-span-2 md:col-span-1 min-w-0 text-[11px] font-medium text-slate-500">Search (member, user ID, TL, team)<input value={f.q} onChange={e=>set({q:e.target.value})} placeholder="Search…" className={box}/></label>
       <Btn onClick={reset}>Reset all</Btn></div>}</div>;

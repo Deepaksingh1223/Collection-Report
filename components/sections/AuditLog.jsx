@@ -126,7 +126,7 @@ export default function AuditLog({open,onClose}){
                     <p className="text-xs font-medium text-red-700 mb-2">Removed member details:</p>
                     <div className="grid grid-cols-2 gap-2 text-xs text-slate-700">
                       <div><span className="font-medium">Name:</span> {log.before.name}</div>
-                      <div><span className="font-medium">TL:</span> {log.before.tlName}</div>
+                      <div><span className="font-medium">Instant Fundz:</span> {log.before.tlName}</div>
                       <div><span className="font-medium">Target:</span> {inr(log.before.target)}</div>
                       <div><span className="font-medium">Status:</span> {log.before.status}</div>
                     </div>
@@ -141,7 +141,7 @@ export default function AuditLog({open,onClose}){
                     <p className="text-xs font-medium text-emerald-700 mb-2">New member details:</p>
                     <div className="grid grid-cols-2 gap-2 text-xs text-slate-700">
                       <div><span className="font-medium">Name:</span> {log.after.name}</div>
-                      <div><span className="font-medium">TL:</span> {log.after.tlName}</div>
+                      <div><span className="font-medium">Instant Fundz:</span> {log.after.tlName}</div>
                       <div><span className="font-medium">Target:</span> {inr(log.after.target)}</div>
                       <div><span className="font-medium">Status:</span> {log.after.status}</div>
                     </div>

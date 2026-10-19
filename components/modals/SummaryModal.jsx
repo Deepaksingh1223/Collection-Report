@@ -22,17 +22,17 @@ export default function SummaryModal({d,onClose,onImport}){
         </div></section>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <section className="rounded-xl bg-emerald-50 ring-1 ring-emerald-200 p-4"><h3 className="flex items-center gap-1.5 text-sm font-semibold text-emerald-800 mb-2"><Star size={15} fill="currentColor"/>Top performers</h3><ul>
-          {d.bestTL&&<Row a={`Best team: ${d.bestTL.team}`} b={`TL ${d.bestTL.name}`} c={`${d.bestTL.achievement.toFixed(1)}%`}/>}
-          {d.bestTL&&<Row a={`TL Incentive`} b="" c={d.bestTL.eligible?inr(d.bestTL.incentive||0):"Not eligible"}/>}
+          {d.bestTL&&<Row a={`Best team: ${d.bestTL.team}`} b={`Instant Fundz ${d.bestTL.name}`} c={`${d.bestTL.achievement.toFixed(1)}%`}/>}
+          {d.bestTL&&<Row a={`Instant Fundz Incentive`} b="" c={d.bestTL.eligible?inr(d.bestTL.incentive||0):"Not eligible"}/>}
           {d.top[0]&&<Row a={`Best member: ${d.top[0].name}`} b={d.top[0].tlName} c={`${d.top[0].achievement.toFixed(1)}%`}/>}
           {d.top[0]&&<Row a={`Member Incentive`} b="" c={d.top[0].eligible?inr(d.top[0].incentive||0):"Not eligible"}/>}
           {d.topCollector&&<Row a={`Highest collection: ${d.topCollector.name}`} b="" c={inr(d.topCollector.collected)}/>}
           {d.bestDay&&<Row a={`Best day: ${fmtDate(d.bestDay.date)}`} b="" c={inr(d.bestDay.collected)}/>}
           {d.top.map((e,i)=><Row key={e.id} a={`${["🏆","🥈","🥉"][i]} ${e.name}`} b={inr(e.collected)} c={`${e.achievement.toFixed(1)}%`}/>)}</ul></section>
         <section className="rounded-xl bg-slate-50 ring-1 ring-slate-200 p-4"><h3 className="flex items-center gap-1.5 text-sm font-semibold text-amber-700 mb-2"><AlertTriangle size={15}/>Attention required</h3><ul>
-          {d.worstTL&&<Row a={`Lowest team: ${d.worstTL.team}`} b={`TL ${d.worstTL.name}`} c={`${d.worstTL.achievement.toFixed(1)}%`}/>}
-          {d.worstTL&&<Row a={`TL Incentive`} b="" c={d.worstTL.eligible?inr(d.worstTL.incentive||0):"Not eligible"}/>}
-          {d.lowTLs.filter(x=>x!==d.worstTL).map(x=><Row key={x.id} a={`Low TL: ${x.name}`} b={x.team} c={`${x.achievement.toFixed(1)}%`}/>)}
+          {d.worstTL&&<Row a={`Lowest team: ${d.worstTL.team}`} b={`Instant Fundz ${d.worstTL.name}`} c={`${d.worstTL.achievement.toFixed(1)}%`}/>}
+          {d.worstTL&&<Row a={`Instant Fundz Incentive`} b="" c={d.worstTL.eligible?inr(d.worstTL.incentive||0):"Not eligible"}/>}
+          {d.lowTLs.filter(x=>x!==d.worstTL).map(x=><Row key={x.id} a={`Low Instant Fundz: ${x.name}`} b={x.team} c={`${x.achievement.toFixed(1)}%`}/>)}
           {d.behind.map(x=><Row key={x.id} a={`${x.team} behind target`} b="Remaining" c={inr(x.pending)}/>)}
           {d.lowMembers.slice(0,3).map(e=><Row key={e.id} a={`↓ ${e.name}`} b={e.tlName} c={`${e.achievement.toFixed(1)}%`}/>)}
           {d.lowDay&&<Row a={`Lowest day: ${fmtDate(d.lowDay.date)}`} b="" c={inr(d.lowDay.collected)}/>}</ul></section></div></>}

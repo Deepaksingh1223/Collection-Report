@@ -20,13 +20,13 @@ export default function LoginPage(){
         localStorage.setItem("isLoggedIn","true");
         localStorage.setItem("userRole","head");
         localStorage.setItem("userId",userId);
-        localStorage.setItem("userName","Rahul Sharma");
+        localStorage.setItem("userName","Rasul");
         router.push("/");
       }else if(userId.startsWith("TL-")&&password==="admin123"){
         localStorage.setItem("isLoggedIn","true");
         localStorage.setItem("userRole","tl");
         localStorage.setItem("userId",userId);
-        localStorage.setItem("userName",userId==="TL-1001"?"Amit":"Neeraj");
+        localStorage.setItem("userName",userId==="TL-1001"?"Shivani":"Prabhleen");
         router.push("/");
       }else if(userId.startsWith("EX-")&&password==="admin123"){
         localStorage.setItem("isLoggedIn","true");

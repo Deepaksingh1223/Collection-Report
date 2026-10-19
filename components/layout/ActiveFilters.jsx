@@ -7,7 +7,7 @@ import {TLS} from "../../data/tlData";
 import {executives} from "../../data/executiveData";
 export default function ActiveFilters({f,onClear,onShowAll}){
   const chips=[];
-  if(f.tl)chips.push(["tl",`Team: ${TLS.find(t=>t.id===f.tl)?.team}`]);
+  if(f.tl)chips.push(["tl",`Instant Fundz: ${TLS.find(t=>t.id===f.tl)?.name}`]);
   if(f.ex)chips.push(["ex",`Member: ${executives.find(e=>e.id===f.ex)?.name}`]);
   if(f.q)chips.push(["q",`Search: ${f.q}`]);
   if(f.src)chips.push(["src",f.src==="imported"?"Imported only":"Historical only"]);

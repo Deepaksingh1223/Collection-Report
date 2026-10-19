@@ -46,7 +46,7 @@ export default function DeleteConfirmModal({open,onClose,onSuccess,member}){
           Are you sure you want to delete <b>{member.name}</b> ({member.userId})?
         </p>
         <p className="text-xs text-slate-500 mt-2">
-          Current target: {member.target?.toLocaleString()||"N/A"} · TL: {member.tlName}
+          Current target: {member.target?.toLocaleString()||"N/A"} · Instant Fundz: {member.tlName}
         </p>
       </div>
 

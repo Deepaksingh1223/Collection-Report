@@ -7,7 +7,7 @@ import {Trophy,Edit,Trash2,UserPlus} from "lucide-react";
 import {Badge,Btn,Card,Pager,Pill,TierTag,TD,TH,medal} from "../ui";
 import {inr} from "../../utils/formatters";
 import {downloadCSV} from "../../utils/csv";
-const COLS=[["name","Member"],["userId","User ID"],["tlName","TL"],["team","Team"],["target","Target"],["collected","Collection"],["pending","Remaining"],["achievement","Ach %"],["incentive","Incentive"],["status","Status"]];
+const COLS=[["name","Member"],["userId","User ID"],["tlName","Instant Fundz"],["team","Team"],["target","Target"],["collected","Collection"],["pending","Remaining"],["achievement","Ach %"],["incentive","Incentive"],["status","Status"]];
 const TABS=[["","All"],["top","Top"],["avg","Average"],["low","Low"]];
 
 // rows = members in the current focus, allRows = every member. When a focus is active the user can switch to "All members".
@@ -22,7 +22,7 @@ export default function MemberTable({rows,allRows,focused,selectedEx,onSelect,on
   const toggle=focused&&userRole!=="executive"&&<div className="inline-flex rounded-lg bg-slate-100 p-0.5 text-xs font-medium">{[["focus",`Selected (${rows.length})`],["all",`All members (${allRows.length})`]].map(([v,l])=>
     <button key={v} onClick={()=>setScope(v)} className={`px-2.5 py-1 rounded-md transition ${scope===v?"bg-white shadow-sm text-slate-900":"text-slate-500"}`}>{l}</button>)}</div>;
   const canManage=userRole!=="executive";
-  return <Card id="members" title="Individual Performance" subtitle="Click a member to focus" right={<div className="flex items-center gap-2">{toggle}{canManage&&<Btn onClick={onAdd} className="inline-flex items-center gap-1.5"><UserPlus size={14}/>Add Member</Btn>}<Btn onClick={()=>downloadCSV(csv,"team-members.csv")}>Export CSV</Btn></div>}>
+  return <Card id="members" title="Individual Performance" subtitle="Click a member to focus" right={<div className="flex flex-wrap items-center gap-2">{toggle}{canManage&&<Btn onClick={onAdd} className="inline-flex items-center gap-1.5"><UserPlus size={14}/>Add Member</Btn>}<Btn onClick={()=>downloadCSV(csv,"team-members.csv")}>Export CSV</Btn></div>}>
     {topC&&<div className="grid sm:grid-cols-2 gap-3 mb-4 text-sm"><div className="rounded-lg bg-emerald-50 ring-1 ring-emerald-100 px-3 py-2">Highest collection: <b>{topC.name}</b> · {inr(topC.collected)}</div><div className="rounded-lg bg-emerald-50 ring-1 ring-emerald-100 px-3 py-2">Highest achievement: <b>{topA.name}</b> · {topA.achievement.toFixed(1)}%</div></div>}
     <div className="flex flex-wrap gap-2 mb-3">{TABS.map(([v,l])=><button key={l} onClick={()=>setTier(v)} className={`px-3 py-1 rounded-full text-xs font-medium transition ${tier===v?"bg-slate-900 text-white":"bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{l} {v?ranked.filter(e=>e.tier===v).length:ranked.length}</button>)}</div>
     <div className="overflow-x-auto"><table className="w-full text-sm"><thead className="border-b border-slate-100"><tr><th className={TH}>Rank</th>

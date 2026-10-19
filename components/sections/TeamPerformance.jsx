@@ -9,7 +9,7 @@ const fill=(t,first)=>first||t.tier==="top"?"bg-emerald-500":t.tier==="low"?"bg-
 // Table comparing every team. `selected` = currently focused TL id; clicking a row focuses it, clicking again shows all.
 export function TeamPerformance({rows,selected,onSelect}){
   return <Card id="teams" title="Team Performance" subtitle="All teams ranked · click a row to focus, click again to show everyone"><div className="overflow-x-auto"><table className="w-full text-sm"><thead className="border-b border-slate-100"><tr>
-    {["Rank","Team","Leader","Members","Target","Collection","Avg / member","Ach %","Incentive","Status"].map(h=><th key={h} className={TH}>{h}</th>)}</tr></thead><tbody>
+    {["Rank","Team","Instant Fundz","Members","Target","Collection","Avg / member","Ach %","Incentive","Status"].map(h=><th key={h} className={TH}>{h}</th>)}</tr></thead><tbody>
     {rows.map(t=>{const first=t.rank===1&&rows.length>1,sel=selected===t.id;
       return <tr key={t.id} onClick={()=>onSelect(t.id)} className={`border-b border-slate-50 last:border-0 cursor-pointer transition hover:bg-orange-50/40 ${sel?"bg-orange-50 ring-1 ring-inset ring-brand-orange":first?"bg-emerald-50/60":t.tier==="low"?"text-slate-500 bg-slate-50/60":""}`}>
         <td className={TD}>{medal(t.rank)}</td><td className={TD+" font-medium"}>{t.team}{sel&&<span className="ml-2 text-[10px] font-semibold text-brand-orange">SELECTED</span>}{t.importedCount>0&&<span className="ml-2"><Pill>New data</Pill></span>}</td>
@@ -21,7 +21,7 @@ export function TeamPerformance({rows,selected,onSelect}){
 
 // Ranked TL cards. Same selection behaviour as the table above.
 export function TLPerformance({rows,selected,onSelect}){
-  return <Card id="tls" title="TL Performance" subtitle="Ranked for the selected period"><div className="space-y-3">
+  return <Card id="tls" title="Instant Fundz Performance" subtitle="Ranked for the selected period"><div className="space-y-3">
     {rows.map(t=>{const first=t.rank===1&&rows.length>1,sel=selected===t.id;
       return <button key={t.id} onClick={()=>onSelect(t.id)} className={`w-full text-left rounded-xl p-4 transition ${sel?"bg-orange-50 ring-2 ring-brand-orange":first?"bg-emerald-50 ring-2 ring-emerald-300 shadow-sm":t.tier==="low"?"bg-slate-50 ring-1 ring-slate-200 text-slate-500":"ring-1 ring-slate-200 hover:ring-brand-orange"}`}>
         <div className="flex items-center justify-between gap-2"><div className="flex items-center gap-3"><span className="text-xl w-8 text-center">{medal(t.rank)}</span>

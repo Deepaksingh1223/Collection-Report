@@ -99,7 +99,7 @@ export default function EditMemberModal({open,onClose,onSuccess,member}){
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Team Leader *</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Instant Fundz *</label>
           <select value={formData.tlId} onChange={e=>setFormData({...formData,tlId:e.target.value})}
             className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange focus:border-brand-orange outline-none" required>
             {TLS.map(tl=>(

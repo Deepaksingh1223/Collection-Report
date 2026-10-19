@@ -3,7 +3,7 @@
  * Total monthly target: ₹10 Crore
  */
 export const brand="Instant Fundz";
-export const head={id:"H001",name:"Rahul Sharma",userId:"HD-001"};
+export const head={id:"H001",name:"Rasul",userId:"HD-001"};
 export const reportingMonth="October 2026";
 export const reportingDate="06 Oct 2026";
 // Total monthly target: ₹10 Crore

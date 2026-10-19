@@ -21,7 +21,7 @@ export default function DashboardHeader({stamp,period,importedTotal,onRefresh,on
     const interval=setInterval(updateTime,1000);
     return()=>clearInterval(interval);
   },[]);
-  const roleLabel=userRole==="head"?"Head":userRole==="tl"?"Team Leader":"Team Member";
+  const roleLabel=userRole==="head"?"Head":userRole==="tl"?"Instant Fundz":"Team Member";
   return <header className="sticky top-0 z-30 bg-slate-50/85 backdrop-blur border-b border-slate-200/70">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-3"><div className="h-10 w-10 rounded-lg bg-gradient-to-br from-brand-orange to-brand-red text-white grid place-items-center font-semibold">{brand[0]}</div>
