@@ -91,9 +91,9 @@ export default function Page(){
           {userRole!=="executive"&&<KPICards t={d.total} tlRows={d.tlRows} members={d.insights.members} imported={d.insights.impRecs}/>}
           {userRole!=="executive"&&<TeamTree tlRows={d.visibleTlRows} allExecRows={d.visibleExecRows}/>}
           {userRole!=="executive"&&<TeamPerformance rows={d.visibleTlRows} selected={f.tl} onSelect={toggleTL}/>}
-          {userRole!=="executive"&&<div className="grid gap-5 lg:grid-cols-2"><TLPerformance rows={d.visibleTlRows} selected={f.tl} onSelect={toggleTL}/><TeamChart rows={d.visibleTlRows} selected={f.tl}/></div>}
+          {userRole!=="executive"&&<TLPerformance rows={d.visibleTlRows} selected={f.tl} onSelect={toggleTL}/>}
           <MemberTable rows={d.execRows} allRows={d.visibleExecRows} focused={focused} selectedEx={f.ex} onSelect={e=>d.set({tl:e.tlId,ex:f.ex===e.id?"":e.id})} onAdd={handleAddMember} onEdit={handleEditMember} onDelete={handleDeleteMember} userRole={userRole}/>
-          <div className="grid gap-5 lg:grid-cols-2"><TrendChart rows={d.daily}/>{userRole!=="executive"&&<TopChart rows={d.visibleExecRows}/>}</div>
+          {userRole!=="executive"&&<TopChart rows={d.visibleExecRows}/>}
           <div className="grid gap-5 lg:grid-cols-3"><div className="lg:col-span-2 overflow-auto"><DailyData rows={d.daily} allRows={d.dailyCtx} selected={f.from&&f.from===f.to?f.from:""} onPick={pickDate} userRole={userRole}/></div><MonthlyTrend rows={d.monthly}/></div>
           {userRole!=="executive"&&<AttentionPanel tlRows={d.visibleTlRows} members={d.visibleExecRows} onSelect={d.set}/>}
         </>}

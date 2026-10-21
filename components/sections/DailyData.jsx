@@ -1,33 +1,18 @@
 /**
- * Exports DailyData (date-wise chart + table) and MonthlyTrend (month-wise bars).
+ * Exports DailyData (date-wise table) and MonthlyTrend (month-wise bars).
  * DailyData can expand from the selected dates to every date of the month with one button.
  */
 import {useState} from "react";
 import {Btn,Card,Empty,Pill,TD,TH} from "../ui";
 import {fmtDate,inr,monthLabel} from "../../utils/formatters";
-const short=n=>n>=1e7?`${(n/1e7).toFixed(1)}Cr`:n>=1e5?`${(n/1e5).toFixed(0)}L`:`${Math.round(n/1e3)}k`;
-
-// Bars per date: grey = target, indigo = collection, violet = day with imported data. Non-selected dates fade when one date is selected.
-function Chart({rows,selected,onPick}){
-  const L=44,R=8,T=10,B=24,W=700,H=230,n=rows.length,bw=(W-L-R)/n,max=Math.max(...rows.flatMap(d=>[d.target,d.collected]),1),y=v=>T+(H-T-B)*(1-v/max);
-  return <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" role="img" aria-label="Daily target vs collection">
-    {[0,.5,1].map(g=><g key={g}><line x1={L} x2={W-R} y1={y(max*g)} y2={y(max*g)} stroke="#e2e8f0"/><text x={L-6} y={y(max*g)+4} textAnchor="end" fontSize="10" fill="#64748b">{short(max*g)}</text></g>)}
-    {rows.map((d,i)=>{const x=L+i*bw,w=Math.max(bw*0.36,1.5),dim=selected&&selected!==d.date;return <g key={d.date} onClick={()=>onPick(d.date)} className="cursor-pointer" opacity={dim?0.35:1}>
-      <title>{`${fmtDate(d.date)} — Target ${inr(d.target)}, Collection ${inr(d.collected)}${d.importedCount?" (imported)":""}`}</title>
-      <rect x={x+bw*0.1} y={y(d.target)} width={w} height={H-B-y(d.target)} fill="#cbd5e1" rx="1"/>
-      <rect x={x+bw*0.1+w+1} y={y(d.collected)} width={w} height={H-B-y(d.collected)} fill={d.importedCount?"#7c3aed":"#4f46e5"} rx="1"/>
-      {(i===0||i===n-1||i===Math.floor(n/2))&&<text x={x+bw/2} y={H-8} textAnchor="middle" fontSize="10" fill="#64748b">{fmtDate(d.date).slice(0,6)}</text>}</g>})}</svg>;
-}
 
 // rows = dates in the selected range, allRows = every date of the surrounding month(s). `selected` = single picked date.
 export function DailyData({rows,allRows,selected,onPick,userRole}){
   const [all,setAll]=useState(false),canExpand=allRows.length>rows.length,view=all&&canExpand?allRows:rows;
   const isExecutive=userRole==="executive";
-  return <Card id="trends" title="Date-wise Performance" subtitle="Click a bar or row to focus a date, click again to clear"
+  return <Card id="trends" title="Date-wise Performance" subtitle="Click a row to focus a date, click again to clear"
     right={canExpand&&<Btn onClick={()=>setAll(!all)}>{all?"Selected dates only":`Show all ${allRows.length} dates`}</Btn>}>
     {!view.length?<Empty/>:<>
-    <div className="flex flex-wrap gap-4 text-xs text-slate-500 mb-2"><span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-slate-300"/>Target</span><span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-indigo-600"/>Collection</span><span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-violet-600"/>Imported day</span></div>
-    <Chart rows={view} selected={selected} onPick={onPick}/>
     <div className="mt-4 overflow-auto max-h-80 rounded-lg ring-1 ring-slate-100"><table className="w-full text-sm"><thead className="sticky top-0 bg-white shadow-[0_1px_0_#f1f5f9]"><tr>
       {[...["Date","Target","Collection","Remaining","Ach %"],...(!isExecutive?["Top performer","Best Instant Fundz"]:[]),"Source"].map(h=><th key={h} className={TH}>{h}</th>)}</tr></thead><tbody>
       {view.map(d=><tr key={d.date} onClick={()=>onPick(d.date)} className={`border-t border-slate-50 cursor-pointer hover:bg-indigo-50/40 transition ${selected===d.date?"bg-indigo-50":d.importedCount?"bg-violet-50/60":""} ${d.importedCount?"border-l-2 border-l-violet-500":""}`}>
