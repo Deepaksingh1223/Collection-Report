@@ -79,13 +79,14 @@ export default function Page(){
   };
 
   const handleDownloadDRR=()=>{
-    // Get filtered data based on current selection (day/week/month)
-    const filteredTlRows = d.visibleTlRows || d.tlRows;
-    const filteredExecRows = d.visibleExecRows || d.execRows;
+    // Get ALL teams data (not filtered by TL selection) to ensure both TLs are included
+    // Only filter by date period, not by specific TL
+    const allTlRows = d.allTlRows || d.tlRows;
+    const allExecRows = d.allExecRows || d.execRows;
 
     // Group members by team leader
     const membersByTeam = {};
-    filteredExecRows.forEach(exec => {
+    allExecRows.forEach(exec => {
       if (!membersByTeam[exec.tlId]) {
         membersByTeam[exec.tlId] = [];
       }
@@ -93,7 +94,7 @@ export default function Page(){
     });
 
     // Prepare data for all teams
-    const tlData = filteredTlRows.map(tl => ({
+    const tlData = allTlRows.map(tl => ({
       name: tl.name,
       members: membersByTeam[tl.id] || []
     }));
