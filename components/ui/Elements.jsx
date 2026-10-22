@@ -20,8 +20,8 @@ export const TierTag=({tier})=>tier==="top"?<span className="inline-flex items-c
   :tier==="low"?<span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600"><AlertTriangle size={12}/>↓ Attention required</span>:null;
 
 export const Btn=({children,className="",...p})=><button {...p} className={`px-3 py-1.5 text-sm font-medium rounded-lg bg-white ring-1 ring-slate-200 hover:bg-slate-50 hover:ring-slate-300 active:scale-95 transition disabled:opacity-40 ${className}`}>{children}</button>;
-export const Sel=({label,v,set,opts})=><label className="block min-w-0 text-[11px] font-medium text-slate-500">{label}
-  <select value={v} onChange={e=>set(e.target.value)} className="mt-1 w-full rounded-lg bg-white ring-1 ring-slate-200 px-2.5 py-2 text-sm text-slate-900 hover:ring-slate-300 transition"><option value="">All</option>
+export const Sel=({label,v,set,opts,className=""})=><label className="block min-w-0 text-[11px] font-medium text-slate-500">{label}
+  <select value={v} onChange={e=>set(e.target.value)} className={`mt-1 w-full rounded-lg ring-1 px-2.5 py-2 text-sm transition ${v?"bg-brand-orange text-white ring-brand-orange":"bg-white ring-slate-200 text-slate-900 hover:ring-slate-300"} ${className}`}><option value="">All</option>
   {opts.map(o=><option key={o.v??o} value={o.v??o}>{o.l??o}</option>)}</select></label>;
 export function Pager({pg,pages,set,size,setSize}){return <div className="flex flex-wrap items-center justify-between gap-2 pt-4 text-sm text-slate-600">
   {setSize?<label className="flex items-center gap-2">Rows<select value={size} onChange={e=>setSize(+e.target.value)} className="rounded-lg ring-1 ring-slate-200 px-1.5 py-1">{[5,10,25].map(n=><option key={n}>{n}</option>)}</select></label>:<span/>}

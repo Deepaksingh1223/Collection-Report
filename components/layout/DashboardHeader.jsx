@@ -7,7 +7,7 @@ import {Calendar,RefreshCw,Trophy,Upload,LogOut,Clock,History,Download} from "lu
 import {Btn} from "../ui";
 import {brand,head} from "../../data/dashboardData";
 import {useEffect,useState} from "react";
-export default function DashboardHeader({stamp,period,importedTotal,onRefresh,onImport,onSummary,onLogout,onAuditLog,userRole,onDownloadDaywise,onDownloadMonthwise,onDownloadWhatsApp}){
+export default function DashboardHeader({stamp,period,importedTotal,onRefresh,onImport,onSummary,onLogout,onAuditLog,userRole,onDownloadDRR,selectedPeriod}){
   const [currentTime,setCurrentTime]=useState("");
   const [userName,setUserName]=useState("");
   useEffect(()=>{
@@ -31,9 +31,7 @@ export default function DashboardHeader({stamp,period,importedTotal,onRefresh,on
         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-white ring-1 ring-slate-200"><Clock size={14} className="text-slate-500"/>{currentTime}</span>
         <Btn onClick={onSummary} className="inline-flex items-center gap-1.5"><Trophy size={14}/>Summary</Btn>
         <button onClick={onImport} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-gradient-to-r from-brand-orange to-brand-red text-white hover:from-orange-600 hover:to-red-700 active:scale-95 transition"><Upload size={14}/>Import data{importedTotal>0&&<span className="ml-1 rounded-full bg-white/25 px-1.5 text-xs">{importedTotal}</span>}</button>
-        {userRole!=="executive"&&<Btn onClick={onDownloadWhatsApp} className="inline-flex items-center gap-1.5"><Download size={14}/>DRR</Btn>}
-        {userRole!=="executive"&&<Btn onClick={onDownloadDaywise} className="inline-flex items-center gap-1.5"><Download size={14}/>Daywise</Btn>}
-        {userRole!=="executive"&&<Btn onClick={onDownloadMonthwise} className="inline-flex items-center gap-1.5"><Download size={14}/>Monthwise</Btn>}
+        {userRole!=="executive"&&<Btn onClick={onDownloadDRR} className="inline-flex items-center gap-1.5"><Download size={14}/>DRR Report ({selectedPeriod})</Btn>}
         {userRole!=="executive"&&<Btn onClick={onAuditLog} className="inline-flex items-center gap-1.5"><History size={14}/>Audit Log</Btn>}
         <Btn onClick={onRefresh} aria-label="Refresh" className="inline-flex items-center"><RefreshCw size={14}/></Btn>
         <button onClick={onLogout} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 active:scale-95 transition" title="Logout"><LogOut size={14}/>Logout</button></div></div></header>;

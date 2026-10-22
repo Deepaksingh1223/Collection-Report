@@ -27,7 +27,7 @@ import EditMemberModal from "../components/modals/EditMemberModal";
 import DeleteConfirmModal from "../components/modals/DeleteConfirmModal";
 import AuditLog from "../components/sections/AuditLog";
 import {Card,Empty,RefreshContext,Skeleton} from "../components/ui";
-import {downloadDaywiseReport,downloadMonthwiseReport,downloadWhatsAppReport} from "../utils/excelExport";
+import {downloadWhatsAppReport} from "../utils/excelExport";
 
 export const dynamic='force-dynamic';
 
@@ -78,12 +78,12 @@ export default function Page(){
     d.refresh(); // Refresh dashboard data after member changes
   };
 
-  const handleDownloadWhatsApp=()=>{
-    // Download DRR report for all teams based on current filter
+  const handleDownloadDRR=()=>{
+    // Get filtered data based on current selection (day/week/month)
     const filteredTlRows = d.visibleTlRows || d.tlRows;
     const filteredExecRows = d.visibleExecRows || d.execRows;
 
-    // Group members by team
+    // Group members by team leader
     const membersByTeam = {};
     filteredExecRows.forEach(exec => {
       if (!membersByTeam[exec.tlId]) {
@@ -92,29 +92,19 @@ export default function Page(){
       membersByTeam[exec.tlId].push(exec);
     });
 
-    // Download each team's report
-    filteredTlRows.forEach(tl => {
-      const tlMembers = membersByTeam[tl.id] || [];
-      downloadWhatsAppReport(tlMembers, tl.name, d.periodLabel);
-    });
-  };
+    // Prepare data for all teams
+    const tlData = filteredTlRows.map(tl => ({
+      name: tl.name,
+      members: membersByTeam[tl.id] || []
+    }));
 
-  const handleDownloadDaywise=()=>{
-    const filteredDaily = d.daily || [];
-    const filteredTlRows = d.visibleTlRows || d.tlRows;
-    const filteredExecRows = d.visibleExecRows || d.execRows;
-    downloadDaywiseReport(filteredDaily, filteredTlRows, filteredExecRows, d.periodLabel);
-  };
-
-  const handleDownloadMonthwise=()=>{
-    const filteredTlRows = d.visibleTlRows || d.tlRows;
-    const filteredExecRows = d.visibleExecRows || d.execRows;
-    downloadMonthwiseReport(filteredTlRows, filteredExecRows, d.periodLabel);
+    // Download single file with all teams
+    downloadWhatsAppReport(tlData, d.periodLabel);
   };
 
   return <RefreshContext.Provider value={d.reload}>
     {!d.ready?<Skeleton/>:<>
-      <DashboardHeader stamp={d.stamp} period={d.periodLabel} importedTotal={d.importedTotal} onRefresh={d.refresh} onImport={openImport} onSummary={()=>d.setShowSummary(true)} onLogout={handleLogout} onAuditLog={()=>setAuditLogOpen(true)} userRole={userRole} onDownloadWhatsApp={handleDownloadWhatsApp} onDownloadDaywise={handleDownloadDaywise} onDownloadMonthwise={handleDownloadMonthwise}/>
+      <DashboardHeader stamp={d.stamp} period={d.periodLabel} importedTotal={d.importedTotal} onRefresh={d.refresh} onImport={openImport} onSummary={()=>d.setShowSummary(true)} onLogout={handleLogout} onAuditLog={()=>setAuditLogOpen(true)} userRole={userRole} onDownloadDRR={handleDownloadDRR} selectedPeriod={f.month||f.from||"Today"}/>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <FilterBar f={f} set={d.set} reset={d.reset} resetDates={d.resetDates} months={d.months} bounds={d.bounds} userRole={userRole} userId={userId}/>
         {userRole!=="executive"&&<ActiveFilters f={f} onClear={k=>d.set(k==="tl"?{tl:"",ex:""}:{[k]:""})} onShowAll={d.showEverything}/>}
