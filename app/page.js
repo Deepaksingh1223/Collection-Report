@@ -82,8 +82,7 @@ export default function Page(){
   };
 
   const handleDownloadDRR=()=>{
-    // Get ALL team members from base data (ignoring role-based filtering)
-    // This ensures both Shivani and Prabhleen are always included
+    // Get ALL team members from base data
     const allMembers = getAllMembers();
 
     // Group members by team leader
@@ -95,13 +94,26 @@ export default function Page(){
       membersByTeam[exec.tlId].push(exec);
     });
 
-    // Prepare data for all teams using TLS base data
-    const tlData = TLS.map(tl => ({
-      name: tl.name,
-      members: membersByTeam[tl.id] || []
-    }));
+    // Check if a specific TL is selected in filter
+    // If f.tl is empty or "", download all TLs
+    // If f.tl has a value, download only that specific TL
+    let tlData;
+    if (f.tl) {
+      // Specific TL selected - download only that TL
+      const selectedTl = TLS.find(tl => tl.id === f.tl);
+      tlData = [{
+        name: selectedTl?.name || "Team",
+        members: membersByTeam[f.tl] || []
+      }];
+    } else {
+      // "All" selected - download all TLs
+      tlData = TLS.map(tl => ({
+        name: tl.name,
+        members: membersByTeam[tl.id] || []
+      }));
+    }
 
-    // Download single file with all teams
+    // Download report
     downloadWhatsAppReport(tlData, d.periodLabel);
   };
 

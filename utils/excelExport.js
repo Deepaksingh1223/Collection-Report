@@ -55,7 +55,7 @@ export function downloadWhatsAppReport(tlData, periodLabel) {
     XLSX.utils.book_append_sheet(wb, ws, tl.name);
   });
 
-  // Create combined sheet with all teams
+  // Create combined sheet with all teams (only when multiple teams are selected)
   if (tlData.length > 1) {
     const combinedData = [];
 
