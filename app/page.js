@@ -82,8 +82,7 @@ export default function Page(){
   };
 
   const handleDownloadDRR=()=>{
-    // Get ALL team members from base executives data (ignoring all role-based filtering)
-    // This ensures both Shivani and Prabhleen are always included
+    // Get ALL team members from base executives data
     const allMembers = executives;
 
     // Group members by team leader
@@ -96,22 +95,28 @@ export default function Page(){
     });
 
     // Check if a specific TL is selected in filter
-    // If f.tl is empty or "", download all TLs
-    // If f.tl has a value, download only that specific TL
+    // If f.tl is empty or "", download COMPANY report (all TLs combined as one)
+    // If f.tl has a value, download only that specific TL's report
     let tlData;
     if (f.tl) {
-      // Specific TL selected - download only that TL
+      // Specific TL selected - download only that TL's individual report
       const selectedTl = TLS.find(tl => tl.id === f.tl);
       tlData = [{
         name: selectedTl?.name || "Team",
         members: membersByTeam[f.tl] || []
       }];
     } else {
-      // "All" selected - download all TLs
-      tlData = TLS.map(tl => ({
-        name: tl.name,
-        members: membersByTeam[tl.id] || []
-      }));
+      // "All" selected - download COMPANY report (all TLs combined as single report)
+      // Combine all members from all TLs into one team
+      const allCombinedMembers = [];
+      TLS.forEach(tl => {
+        allCombinedMembers.push(...(membersByTeam[tl.id] || []));
+      });
+
+      tlData = [{
+        name: "Company Report",
+        members: allCombinedMembers
+      }];
     }
 
     // Download report
