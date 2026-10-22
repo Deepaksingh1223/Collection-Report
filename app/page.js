@@ -28,6 +28,9 @@ import DeleteConfirmModal from "../components/modals/DeleteConfirmModal";
 import AuditLog from "../components/sections/AuditLog";
 import {Card,Empty,RefreshContext,Skeleton} from "../components/ui";
 import {downloadWhatsAppReport} from "../utils/excelExport";
+import {TLS} from "../data/tlData";
+import {executives} from "../data/executiveData";
+import {getAllMembers} from "../utils/dataManager";
 
 export const dynamic='force-dynamic';
 
@@ -79,22 +82,21 @@ export default function Page(){
   };
 
   const handleDownloadDRR=()=>{
-    // Get ALL teams data (not filtered by TL selection) to ensure both TLs are included
-    // Only filter by date period, not by specific TL
-    const allTlRows = d.allTlRows || d.tlRows;
-    const allExecRows = d.allExecRows || d.execRows;
+    // Get ALL team members from base data (ignoring role-based filtering)
+    // This ensures both Shivani and Prabhleen are always included
+    const allMembers = getAllMembers();
 
     // Group members by team leader
     const membersByTeam = {};
-    allExecRows.forEach(exec => {
+    allMembers.forEach(exec => {
       if (!membersByTeam[exec.tlId]) {
         membersByTeam[exec.tlId] = [];
       }
       membersByTeam[exec.tlId].push(exec);
     });
 
-    // Prepare data for all teams
-    const tlData = allTlRows.map(tl => ({
+    // Prepare data for all teams using TLS base data
+    const tlData = TLS.map(tl => ({
       name: tl.name,
       members: membersByTeam[tl.id] || []
     }));
