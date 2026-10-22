@@ -82,8 +82,9 @@ export default function Page(){
   };
 
   const handleDownloadDRR=()=>{
-    // Get ALL team members from base data
-    const allMembers = getAllMembers();
+    // Get ALL team members from base executives data (ignoring all role-based filtering)
+    // This ensures both Shivani and Prabhleen are always included
+    const allMembers = executives;
 
     // Group members by team leader
     const membersByTeam = {};
